@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
+#include <iomanip>
 #include <cstdlib>
 
 using namespace std;
@@ -53,12 +54,15 @@ public:
 
     void print_tasks()
     {
-        cout << "--------Your Tasks-------------" << endl
-             << endl;
+        cout << "-----------Your Tasks-------------" << endl
+             << endl
+             << "|" << "Sr No" << setw(2) << "|" << setw(13) << "Task Name" << endl;
         for (int i = 0; i < tasks.size(); i++)
         {
-            cout << i + 1 << ")" << tasks[i] << endl;
+            cout << left << setw(2) << "|" << setw(2) << i + 1 << setw(3) << ")" << setw(4) << "|" << tasks[i] << endl;
         }
+
+        cout << endl;
     }
 
     void delete_task()
