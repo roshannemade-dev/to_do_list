@@ -3,14 +3,15 @@
 #include <fstream>
 #include <iomanip>
 #include <cstdlib>
+#include <ctime>
+#include <chrono>
 
 using namespace std;
 
 class ToDoListManager
 {
 private:
-    vector<string> tasks;
-    static int task_counter;
+    vector<string> tasks, date, time;
 
 public:
     void save_tasks()
@@ -19,29 +20,35 @@ public:
 
         for (int i = 0; i < tasks.size(); i++)
         {
-            outFile << tasks[i] << endl;
+            outFile << date[i] << "|" << time[i] << "|" << tasks[i] << endl;
         }
     }
 
     void load_tasks()
     {
         ifstream inFile("tasks.txt");
+        string line, date, time, task;
+        stringstream ss;
 
-        while (inFile.eof() == 0)
+        while (getline(inFile, line))
         {
-            string task;
-
-            getline(inFile, task);
-
-            if (task != "")
+            ss << line;
+            if (line != "")
             {
-                tasks.push_back(task);
-                task_counter++;
+                getline(ss, date, '|');
+                getline(ss, time, '|');
+                getline(ss, task);
+
+                ToDoListManager::date.push_back(date);
+                ToDoListManager::time.push_back(time);
+                ToDoListManager::tasks.push_back(task);
             }
+            ss.clear();
         }
     }
     void add_task()
     {
+        stringstream date, time;
         string task;
 
         cout << "Enter the task -";
@@ -49,17 +56,29 @@ public:
         cin.ignore();
         getline(cin, task);
 
+        auto now = chrono::system_clock::now();
+        auto to_time_t = chrono::system_clock::to_time_t(now);
+
+        tm *localTime = localtime(&to_time_t);
+
+        date << put_time(localTime, "%d-%m-%Y");
+        time << put_time(localTime, "%H:%M:%S");
+
+        ToDoListManager::time.push_back(time.str());
+        ToDoListManager::date.push_back(date.str());
         tasks.push_back(task);
+
+        save_tasks();
     }
 
     void print_tasks()
     {
         cout << "-----------Your Tasks-------------" << endl
              << endl
-             << "|" << "Sr No" << setw(2) << "|" << setw(13) << "Task Name" << endl;
+             << left << setw(10) << "Sr No" << setw(13) << "Date" << setw(16) << "Time" << setw(13) << "Task Name" << endl;
         for (int i = 0; i < tasks.size(); i++)
         {
-            cout << left << setw(2) << "|" << setw(2) << i + 1 << setw(3) << ")" << setw(4) << "|" << tasks[i] << endl;
+            cout << left << "  " << i + 1 << setw(5) << ")" << setw(14) << date[i] << setw(14) << time[i] << tasks[i] << endl;
         }
 
         cout << endl;
@@ -82,19 +101,23 @@ public:
         if (task_no > tasks.size())
         {
             cout << "enter valid task no " << endl;
+            system("pause");
         }
         else if (task_no <= tasks.size())
         {
             tasks.erase(tasks.begin() + (task_no - 1));
+            date.erase(date.begin() + (task_no - 1));
+            time.erase(time.begin() + (task_no - 1));
         }
         else
         {
             cout << "enter valid task no " << endl;
+            system("pause");
         }
+
+        save_tasks();
     }
 };
-
-int ToDoListManager::task_counter = 0;
 
 int main()
 {
@@ -110,10 +133,9 @@ int main()
 
         cout << "1) Add task" << endl;
         cout << "2) remove task" << endl;
-        cout << "3) save and quit" << endl
+        cout << "3) print task" << endl;
+        cout << "4) quit" << endl
              << endl;
-
-        to_do_list.print_tasks();
 
         if (isInvalidChoice)
         {
@@ -143,13 +165,8 @@ int main()
             break;
         case 3:
             isInvalidChoice = false;
-            cout << endl
-                 << endl
-                 << "saving tasks...." << endl;
-
-            to_do_list.save_tasks();
-
-            cout << "your tasks are saved" << endl;
+            to_do_list.print_tasks();
+        case 4:
             return 0;
 
         default:
