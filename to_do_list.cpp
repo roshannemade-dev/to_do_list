@@ -82,6 +82,7 @@ public:
         }
 
         cout << endl;
+        system("pause");
     }
 
     void delete_task()
@@ -166,6 +167,7 @@ int main()
         case 3:
             isInvalidChoice = false;
             to_do_list.print_tasks();
+            break;
         case 4:
             return 0;
 
