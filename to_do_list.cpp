@@ -5,6 +5,8 @@
 #include <cstdlib>
 #include <ctime>
 #include <chrono>
+#include <conio.h>
+#include <sstream>
 
 using namespace std;
 
@@ -124,7 +126,7 @@ int main()
 {
     int choice;
     ToDoListManager to_do_list;
-    bool isInvalidChoice;
+    bool isInvalidChoice = false;
 
     to_do_list.load_tasks();
 
@@ -146,13 +148,9 @@ int main()
 
         cout << "enter choice -";
 
-        cin >> choice;
+        choice = _getch() - '0';
 
-        if (cin.fail())
-        {
-            cin.clear();
-            cin.ignore();
-        }
+        cout << choice << endl;
 
         switch (choice)
         {
